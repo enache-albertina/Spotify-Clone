@@ -10,6 +10,38 @@ import java.util.List;
  */
 @Getter
 public final class Song extends AudioFile {
+    public String getAlbum() {
+        return album;
+    }
+
+    public ArrayList<String> getTags() {
+        return tags;
+    }
+
+    public String getLyrics() {
+        return lyrics;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public Integer getReleaseYear() {
+        return releaseYear;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public Integer getLikes() {
+        return likes;
+    }
+
+    public void setLikes(final Integer likes) {
+        this.likes = likes;
+    }
+
     private final String album;
     private final ArrayList<String> tags;
     private final String lyrics;

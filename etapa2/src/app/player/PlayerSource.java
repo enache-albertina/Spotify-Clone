@@ -14,6 +14,60 @@ import java.util.Random;
  * The type Player source.
  */
 public class PlayerSource {
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
+    public Enums.PlayerSourceType getType() {
+        return type;
+    }
+
+    /**
+     * Sets type.
+     *
+     * @param type the type
+     */
+    public void setType(final Enums.PlayerSourceType type) {
+        this.type = type;
+    }
+
+    /**
+     * Gets audio collection.
+     *
+     * @return the audio collection
+     */
+    public AudioCollection getAudioCollection() {
+        return audioCollection;
+    }
+
+    /**
+     * Gets audio file.
+     *
+     * @return the audio file
+     */
+    public AudioFile getAudioFile() {
+        return audioFile;
+    }
+
+    /**
+     * Gets index.
+     *
+     * @return the index
+     */
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * Gets indices.
+     *
+     * @return the indices
+     */
+    public List<Integer> getIndices() {
+        return indices;
+    }
+
     @Getter
     private Enums.PlayerSourceType type;
     @Getter

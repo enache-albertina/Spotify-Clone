@@ -13,6 +13,47 @@ import java.util.List;
  * The type Player.
  */
 public final class Player {
+
+    public boolean isShuffle() {
+        return shuffle;
+    }
+
+    public void setShuffle(final boolean shuffle) {
+        this.shuffle = shuffle;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(final boolean paused) {
+        this.paused = paused;
+    }
+
+    public PlayerSource getSource() {
+        return source;
+    }
+
+    public void setSource(final PlayerSource source) {
+        this.source = source;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public int getSkipTime() {
+        return skipTime;
+    }
+
+    public ArrayList<PodcastBookmark> getBookmarks() {
+        return bookmarks;
+    }
+
     private Enums.RepeatMode repeatMode;
     private boolean shuffle;
     private boolean paused;
@@ -50,8 +91,8 @@ public final class Player {
         if (source != null && source.getAudioFile() != null) {
             PodcastBookmark currentBookmark =
                     new PodcastBookmark(source.getAudioCollection().getName(),
-                                        source.getIndex(),
-                                        source.getDuration());
+                            source.getIndex(),
+                            source.getDuration());
             bookmarks.removeIf(bookmark -> bookmark.getName().equals(currentBookmark.getName()));
             bookmarks.add(currentBookmark);
         }
@@ -74,7 +115,10 @@ public final class Player {
             return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry);
         } else if ("podcast".equals(type)) {
             return createPodcastSource((AudioCollection) entry, bookmarks);
+        } else if ("album".equals(type)) {
+            return new PlayerSource(Enums.PlayerSourceType.PLAYLIST, (AudioCollection) entry);
         }
+
 
         return null;
     }
@@ -124,7 +168,8 @@ public final class Player {
             source.generateShuffleOrder(seed);
         }
 
-        if (source.getType() == Enums.PlayerSourceType.PLAYLIST) {
+        if (source.getType() == Enums.PlayerSourceType.PLAYLIST
+                || source.getType() == Enums.PlayerSourceType.ALBUM) {
             shuffle = !shuffle;
             if (shuffle) {
                 source.updateShuffleIndex();

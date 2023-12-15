@@ -1,25 +1,189 @@
 package app.user;
 
+import app.Admin;
+import app.audio.Collections.Album;
 import app.audio.Collections.AudioCollection;
 import app.audio.Collections.Playlist;
 import app.audio.Collections.PlaylistOutput;
+
 import app.audio.Files.AudioFile;
+import app.audio.Files.Episode;
 import app.audio.Files.Song;
+
 import app.audio.LibraryEntry;
+
+import app.page.ArtistPage;
+import app.page.HostPage;
+import app.page.HomePage;
+import app.page.LikedContentPage;
+import app.page.Page;
+import app.page.PageShowVisitor;
+
 import app.player.Player;
 import app.player.PlayerStats;
+
 import app.searchBar.Filters;
 import app.searchBar.SearchBar;
 import app.utils.Enums;
-import lombok.Getter;
+import app.audio.Collections.Podcast;
 
+
+import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The type User.
  */
 public class User {
+    /**
+     * Gets username.
+     *
+     * @return the username
+     */
+// o lista cu toti utilizatorii normali
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Sets username.
+     *
+     * @param username the username
+     */
+    public void setUsername(final String username) {
+        this.username = username;
+    }
+
+    /**
+     * Gets age.
+     *
+     * @return the age
+     */
+    public int getAge() {
+        return age;
+    }
+
+    /**
+     * Sets age.
+     *
+     * @param age the age
+     */
+    public void setAge(final int age) {
+        this.age = age;
+    }
+
+    /**
+     * Gets city.
+     *
+     * @return the city
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * Sets city.
+     *
+     * @param city the city
+     */
+    public void setCity(final String city) {
+        this.city = city;
+    }
+
+    /**
+     * Gets playlists.
+     *
+     * @return the playlists
+     */
+    public ArrayList<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    /**
+     * Sets playlists.
+     *
+     * @param playlists the playlists
+     */
+    public void setPlaylists(final ArrayList<Playlist> playlists) {
+        this.playlists = playlists;
+    }
+
+    /**
+     * Gets liked songs.
+     *
+     * @return the liked songs
+     */
+    public ArrayList<Song> getLikedSongs() {
+        return likedSongs;
+    }
+
+    /**
+     * Gets followed playlists.
+     *
+     * @return the followed playlists
+     */
+    public ArrayList<Playlist> getFollowedPlaylists() {
+        return followedPlaylists;
+    }
+    /**
+     * Gets player.
+     *
+     * @return the player
+     */
+    public Player getPlayer() {
+        return player;
+    }
+    private Page currentPage;
+
+    /**
+     * Is current used boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isCurrentUsed() {
+        return isCurrentUsed;
+    }
+
+    /**
+     * Sets current used.
+     *
+     * @param currentUsed the current used
+     */
+    public void setCurrentUsed(final boolean currentUsed) {
+        isCurrentUsed = currentUsed;
+    }
+
+    /**
+     * Gets current page.
+     *
+     * @return the current page
+     */
+    public Page getCurrentPage() {
+        return currentPage;
+    }
+
+    /**
+     * Sets current page.
+     *
+     * @param currentPage the current page
+     */
+    public void setCurrentPage(final Page currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    /**
+     * Is online boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    private boolean isCurrentUsed;
+
     @Getter
     private String username;
     @Getter
@@ -34,6 +198,26 @@ public class User {
     private ArrayList<Playlist> followedPlaylists;
     private final Player player;
     private final SearchBar searchBar;
+    private boolean isOnline = true;
+
+    /**
+     * Gets online.
+     *
+     * @return the online
+     */
+    public boolean getOnline() {
+        return isOnline;
+    }
+
+    /**
+     * Sets online.
+     *
+     * @param online the online
+     */
+    public void setOnline(final boolean online) {
+        isOnline = online;
+    }
+
     private boolean lastSearched;
 
     /**
@@ -53,7 +237,20 @@ public class User {
         player = new Player();
         searchBar = new SearchBar(username);
         lastSearched = false;
+        isOnline = true;
+        this.currentPage = new HomePage(this);
+        this.isCurrentUsed = false;
     }
+
+    /**
+     * Change page.
+     *
+     * @param newPage the new page
+     */
+    public void changePage(final Page newPage) {
+        this.currentPage = newPage;
+    }
+
 
     /**
      * Search array list.
@@ -94,10 +291,84 @@ public class User {
         if (selected == null) {
             return "The selected ID is too high.";
         }
+        // extrag numele utilizatorului din selected
+        String userName = selected.getName();
+        if (isArtist(userName)) {
+            modifyOnArtistPage(selected.getName());
+            return "Successfully selected %s's page.".formatted(selected.getName());
+        }
+        if (isHost(userName)) {
+            // printare proprietar pagina
+            modifyOnHostPage(selected.getName());
+            return "Successfully selected %s's page.".formatted(selected.getName());
+        }
 
         return "Successfully selected %s.".formatted(selected.getName());
     }
 
+    /**
+     * Modify on host page.
+     *
+     * @param userName the username
+     */
+    public void modifyOnHostPage(final String userName) {
+        Host selectedHost = (Host) UserSingleton.getInstance().getUsers().stream()
+                .filter(u -> u.getUsername().equals(userName) && u instanceof Host)
+                .findFirst()
+                .orElse(null);
+        this.changePage(new HostPage(selectedHost));
+    }
+
+    /**
+     * Modify on artist page.
+     *
+     * @param userName the username
+     */
+    public void modifyOnArtistPage(final String userName) {
+        Artist selectedArtist = (Artist) UserSingleton.getInstance().getUsers().stream()
+                .filter(u -> u.getUsername().equals(userName) && u instanceof Artist)
+                .findFirst()
+                .orElse(null);
+        this.changePage(new ArtistPage(selectedArtist));
+    }
+
+    /**
+     * Is host boolean.
+     *
+     * @param userName the username
+     * @return the boolean
+     */
+    public final boolean isHost(final String userName) {
+        List<Host> allHosts = UserSingleton.getInstance().getUsers().stream()
+                .filter(user -> user instanceof Host)
+                .map(user -> (Host) user)
+                .collect(Collectors.toList());
+        for (Host host : allHosts) {
+            if (host.getUsername().equals(userName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is artist boolean.
+     *
+     * @param username the username
+     * @return the boolean
+     */
+    public final boolean isArtist(final String userName) {
+        List<Artist> allArtists = UserSingleton.getInstance().getUsers().stream()
+                .filter(user -> user instanceof Artist)
+                .map(user -> (Artist) user)
+                .collect(Collectors.toList());
+        for (Artist artist : allArtists) {
+            if (artist.getUsername().equals(userName)) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Load string.
      *
@@ -107,12 +378,12 @@ public class User {
         if (searchBar.getLastSelected() == null) {
             return "Please select a source before attempting to load.";
         }
-
-        if (!searchBar.getLastSearchType().equals("song")
-            && ((AudioCollection) searchBar.getLastSelected()).getNumberOfTracks() == 0) {
-            return "You can't load an empty audio collection!";
+        if (searchBar.getLastSelected() instanceof AudioCollection) {
+            if (!searchBar.getLastSearchType().equals("song")
+                    && ((AudioCollection) searchBar.getLastSelected()).getNumberOfTracks() == 0) {
+                return "You can't load an empty audio collection!";
+            }
         }
-
         player.setSource(searchBar.getLastSelected(), searchBar.getLastSearchType());
         searchBar.clearSelection();
 
@@ -188,8 +459,8 @@ public class User {
             return "Please load a source before using the shuffle function.";
         }
 
-        if (!player.getType().equals("playlist")) {
-            return "The loaded source is not a playlist.";
+        if (!player.getType().equals("playlist") && !player.getType().equals("album")) {
+            return "The loaded source is not a playlist or an album.";
         }
 
         player.shuffle(seed);
@@ -248,7 +519,8 @@ public class User {
             return "Please load a source before liking or unliking.";
         }
 
-        if (!player.getType().equals("song") && !player.getType().equals("playlist")) {
+        if (!player.getType().equals("song") && !player.getType().equals("playlist")
+                && !player.getType().equals("album")) {
             return "Loaded source is not a song.";
         }
 
@@ -287,6 +559,172 @@ public class User {
     }
 
     /**
+     * Check and set artist current used.
+     */
+    public void checkAndSetArtistCurrentUsed() {
+        if (checkArtistUsage(Admin.getUsers())
+                || checkArtistUsage(UserSingleton.getInstance().getUsers())) {
+            this.setCurrentUsed(true);
+        } else {
+            this.setCurrentUsed(false);
+        }
+    }
+
+    /**
+     * Check podcast user.
+     */
+    public void checkPodcastUser() {
+        if (checkPodcastUsage(Admin.getUsers())
+                || checkPodcastUsage(UserSingleton.getInstance().getUsers())) {
+            this.setCurrentUsed(true);
+        } else {
+            this.setCurrentUsed(false);
+        }
+    }
+
+    /**
+     * Check podcast user remove.
+     *
+     * @param podcast the podcast
+     */
+    public void checkPodcastUserRemove(final Podcast podcast) {
+        if (checkPodcastcanRemove(Admin.getUsers(), podcast)
+                || checkPodcastcanRemove(UserSingleton.getInstance().getUsers(), podcast)) {
+            podcast.setLoadedPodcast(true);
+        } else {
+            podcast.setLoadedPodcast(false);
+        }
+    }
+
+    /**
+     * Check podcastcan remove boolean.
+     *
+     * @param users   the users
+     * @param podcast the podcast
+     * @return the boolean
+     */
+    public boolean checkPodcastcanRemove(final List<User> users, final Podcast podcast) {
+        for (User user : users) {
+            Player currentPlayer = user.getPlayer();
+            if (currentPlayer != null && currentPlayer.getCurrentAudioFile() != null) {
+                String podcastName = currentPlayer.getCurrentAudioFile().getName();
+                if (podcast.getName().equals(podcastName)) {
+                    return true;
+                }
+
+                List<Episode> episodes = podcast.getEpisodes();
+                for (Episode episode : episodes) {
+                    if (episode.getName().equals(podcastName)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check podcast usage boolean.
+     *
+     * @param users the users
+     * @return the boolean
+     */
+    public boolean checkPodcastUsage(final List<User> users) {
+        for (User user : users) {
+            Player currentPlayer = user.getPlayer();
+            if (currentPlayer != null && currentPlayer.getCurrentAudioFile() != null) {
+                String podcastName = currentPlayer.getCurrentAudioFile().getName();
+                if (this instanceof Host) {
+                    for (Podcast podcast : ((Host) this).getPodcastHost()) {
+                        if (podcast.getName().equals(podcastName)) {
+                            return true;
+                        }
+                        // verifica lista de episoade din lista curenta de podcasturi
+                        List<Episode> episodes = podcast.getEpisodes();
+                        for (Episode episode : episodes) {
+                            if (episode.getName().equals(podcastName)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkUserPageUsed(final User user, final List<User> users) {
+        // verific daca pagina userului este folosita
+        for (User currentUser : users) {
+            if (user instanceof Host && user != currentUser) {
+                Page currentPageLocal = currentUser.getCurrentPage();
+
+                if (currentPageLocal instanceof HostPage) {
+                    HostPage hostPageLocal = (HostPage) currentPageLocal;
+                    // obtin proprietarul paginii curent
+                    User host = hostPageLocal.getHost();
+                    if (host.getUsername().equals(user.getUsername())) {
+                        return true;
+                    }
+                }
+            }
+            if (user instanceof Artist && user != currentUser) {
+                Page currentPageLocal = currentUser.getCurrentPage();
+                if (currentPageLocal instanceof ArtistPage) {
+                    ArtistPage artistPage = (ArtistPage) currentPageLocal;
+                    Artist artist = artistPage.getArtist();
+                    if (artist != null && artist.getUsername().equals(user.getUsername())) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check user page used.
+     */
+    public void checkUserPageUsed() {
+        if (checkUserPageUsed(this, Admin.getUsers())
+                || checkUserPageUsed(this, UserSingleton.getInstance().getUsers())) {
+            this.setCurrentUsed(true);
+        } else {
+            this.setCurrentUsed(false);
+        }
+    }
+
+    private boolean checkArtistUsage(final List<User> users) {
+        for (User user : users) {
+            Player currentPlayer = user.getPlayer();
+            if (currentPlayer != null && currentPlayer.getCurrentAudioFile() != null) {
+                String songName = currentPlayer.getCurrentAudioFile().getName();
+                if (this instanceof Artist) {
+                    for (Album album : ((Artist) this).getAlbums()) {
+                        for (Song song : album.getSongs()) {
+                            if (song.getName().equals(songName)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                if (this instanceof User) {
+                    for (Playlist playlist : ((User) this).getPlaylists()) {
+                        for (Song song : playlist.getSongs()) {
+                            if (song.getName().equals(songName)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Prev string.
      *
      * @return the string
@@ -297,7 +735,6 @@ public class User {
         }
 
         player.prev();
-
         return "Returned to previous track successfully. The current track is %s."
                 .formatted(player.getCurrentAudioFile().getName());
     }
@@ -315,7 +752,7 @@ public class User {
         }
 
         playlists.add(new Playlist(name, username, timestamp));
-
+        Admin.getPlaylists().add(new Playlist(name, username, timestamp));
         return "Playlist created successfully.";
     }
 
@@ -445,6 +882,26 @@ public class User {
     }
 
     /**
+     * Switch connection status string.
+     *
+     * @param user  the user
+     * @return the string
+     */
+    public String switchConnectionStatus(final User user) {
+
+        if (!(user instanceof Artist) && !(user instanceof Host)) {
+            if (user.getOnline()) {
+                user.setOnline(false);
+            } else {
+                user.setOnline(true);
+            }
+            return user.getUsername() + " has changed status successfully.";
+        } else {
+            return user.getUsername() + " is not a normal user.";
+        }
+    }
+
+    /**
      * Gets preferred genre.
      *
      * @return the preferred genre
@@ -478,6 +935,52 @@ public class User {
      * @param time the time
      */
     public void simulateTime(final int time) {
-        player.simulatePlayer(time);
+        if (this.isOnline) {
+            player.simulatePlayer(time);
+        }
+    }
+
+    /**
+     * Display current page content string.
+     *
+     * @return the string
+     */
+// Metodă pentru afișarea conținutului paginii curente
+    public String displayCurrentPageContent() {
+        PageShowVisitor visitor = new PageShowVisitor(this);
+        currentPage.accept(visitor);
+        return visitor.getResult();
+    }
+
+    /**
+     * Print current page string.
+     *
+     * @return the string
+     */
+    public String printCurrentPage() {
+        return this.displayCurrentPageContent();
+    }
+
+    /**
+     * Change page string.
+     *
+     * @param user     the user
+     * @param nextPage the next page
+     * @return the string
+     */
+    public String changePage(final User user, final String nextPage) {
+
+        // Verifică dacă pagina există
+        if (!(nextPage.equals("Home")) && !(nextPage.equals("LikedContent"))) {
+            return username + " is trying to access a non-existent page.";
+        }
+        if (nextPage.equals("Home")) {
+            user.changePage(new HomePage(this));
+        } else if (nextPage.equals("LikedContent")) {
+            user.changePage(new LikedContentPage(this));
+        }
+
+        // Returnează mesajul de succes
+        return username + " accessed " + nextPage + " successfully.";
     }
 }

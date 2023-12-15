@@ -1,6 +1,15 @@
 package fileio.input;
 
 public final class UserInput {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    private String type;
     private String username;
     private int age;
     private String city;

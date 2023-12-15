@@ -23,6 +23,24 @@ public class Enums { // diferite enumuri, le-am gurpat pe toate intr-un loc
     }
 
     public enum PlayerSourceType {
-        LIBRARY, PLAYLIST, PODCAST
+        LIBRARY, PLAYLIST, PODCAST, ALBUM;
     }
+    public enum DateValidation {
+        MIN_YEAR(1900),
+        MAX_YEAR(2023),
+        MAX_MONTH(12),
+        MAX_DAY(31),
+        MAX_DAY_FOR_FEBRUARY(28);
+
+        private final int value;
+
+        DateValidation(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
 }

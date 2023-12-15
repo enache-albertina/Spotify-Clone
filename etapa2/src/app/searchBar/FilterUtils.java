@@ -4,6 +4,9 @@ import app.audio.LibraryEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+import app.user.Artist;
+import app.audio.Collections.Album;
+
 
 /**
  * The type Filter utils.
@@ -114,6 +117,36 @@ public final class FilterUtils {
                                                    final String user) {
         return filter(entries, entry -> entry.matchesOwner(user));
     }
+    // suprascriu metoda filter by owner pentru a putea filtra si dupa artist
+
+    /**
+     * Filter by owner list.
+     *
+     * @param entries the entries
+     * @param owner   the owner
+     * @param artists the artists
+     * @return the list
+     */
+    public static List<LibraryEntry> filterByOwner(final List<LibraryEntry> entries,
+                                                   final String owner, final List<Artist> artists) {
+
+        List<Artist> matchedArtists = new ArrayList<>();
+        for (Artist artist : artists) {
+            String artistName = artist.getUsername();
+            if (artist.getUsername() != null && artistName.equals(owner)) {
+                matchedArtists.add(artist);
+            }
+        }
+        List<LibraryEntry> filteredEntries = new ArrayList<>();
+        for (Artist artist : matchedArtists) {
+            for (Album album : artist.getAlbums()) {
+                filteredEntries.add(new LibraryEntry(album));
+            }
+        }
+
+        return filteredEntries;
+    }
+
 
     /**
      * Filter by playlist visibility list.
@@ -149,6 +182,7 @@ public final class FilterUtils {
         }
         return result;
     }
+
 
     @FunctionalInterface
     private interface FilterCriteria {

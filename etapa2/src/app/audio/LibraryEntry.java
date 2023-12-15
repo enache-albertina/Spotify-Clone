@@ -3,12 +3,33 @@ package app.audio;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import app.user.Artist;
+import app.user.Host;
+import app.audio.Collections.Album;
+import app.audio.Collections.Podcast;
+
 
 /**
  * The type Library entry.
  */
 @Getter
-public abstract class LibraryEntry {
+public class LibraryEntry {
+    private Podcast podcast = null;
+
+    public LibraryEntry(final Podcast podcast) {
+        this.name = podcast.getName();
+        this.podcast = podcast;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
     private final String name;
 
     /**
@@ -18,6 +39,15 @@ public abstract class LibraryEntry {
      */
     public LibraryEntry(final String name) {
         this.name = name;
+    }
+    public LibraryEntry(final Artist artist) {
+        this.name = artist.getUsername();
+    }
+    public LibraryEntry(final Host host) {
+        this.name = host.getUsername();
+    }
+    public LibraryEntry(final Album album) {
+        this.name = album.getName();
     }
 
     /**
