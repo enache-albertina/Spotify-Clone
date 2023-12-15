@@ -47,7 +47,7 @@ A: On the ArtistPage, artists can manage their albums, merchandise, and events. 
 - Admin Commands: Include adding and deleting users, and showing albums and podcasts.
 
 
-## Enhancements
+## Enhancements:
 - User Pages: HomePage shows the top 5 liked songs and followed playlists. LikedContentPage displays all liked songs and followed playlists of a user.
 - Artist and Host Pages: Artists can manage their albums and events, while hosts can manage their podcasts and announcements.
 Page Commands: Includes ChangePage and PrintCurrentPage for navigating and displaying page content.
