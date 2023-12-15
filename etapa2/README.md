@@ -44,7 +44,7 @@ A: On the ArtistPage, artists can manage their albums, merchandise, and events. 
 
 - Music Player: For normal users to play albums with standard music player functionalities like shuffle and repeat.
 
-- Admin Commands: Include adding and deleting users, and showing albums and podcasts
+- Admin Commands: Include adding and deleting users, and showing albums and podcasts.
 
 
 ## Enhancements
