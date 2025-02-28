@@ -1,5 +1,5 @@
 
-# Proiect GlobalWaves  - Etapa 2
+# Proiect GlobalWaves  
 
 Project Description
 
