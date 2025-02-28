@@ -76,6 +76,4 @@ Visitor Interface: The PageVisitor interface defines a visit method for each typ
 😄 Accept Method in Pages: Each page class would have an accept method that takes a PageVisitor and calls the visit method corresponding to its class.
 
 😄 The Visitor pattern allows you to add new operations to existing class hierarchies without changing the classes. It's particularly useful when dealing with a collection of different objects with distinct and evolving functionalities.
-## Addition and specifications
 
-I used the skeleton made available from the first stage.
