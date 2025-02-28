@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="tema_final2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/archive.zip!/" />
+      <root url="jar://$PROJECT_DIR$/ETAPA2.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
